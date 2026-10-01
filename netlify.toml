@@ -1,0 +1,3 @@
+[build]
+command = "node scripts/build-private.js"
+publish = ".private-source/out"

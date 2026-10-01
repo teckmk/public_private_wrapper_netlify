@@ -1,0 +1,11 @@
+{
+  "name": "public-deployment-wrapper",
+  "private": true,
+  "description": "Netlify deployment wrapper that clones and builds a private Next.js repository at build time.",
+  "scripts": {
+    "build": "node scripts/build-private.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
