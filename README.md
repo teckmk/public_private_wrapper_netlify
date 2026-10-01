@@ -13,6 +13,7 @@ Netlify → checkout this repo → node scripts/build-private.js
 
 1. **Private repo**: Next.js app with `output: "export"` in `next.config.*`,
    a `build` script (`next build`), and a committed `package-lock.json`.
+   See [Private app requirements](#private-app-requirements-static-export).
 2. **GitHub token**: create a fine-grained token (see [Creating the GitHub token](#creating-the-github-token)).
 3. **Netlify**: connect *this* repo, then under *Site configuration → Environment variables* add:
 
@@ -21,6 +22,7 @@ Netlify → checkout this repo → node scripts/build-private.js
    | `SOURCE_REPO_URL`    | `https://github.com/<owner>/<repo>.git`       | No credentials in the URL          |
    | `SOURCE_REPO_TOKEN`  | the fine-grained token                        | Mark as secret; scope: Builds      |
    | `SOURCE_REPO_BRANCH` | e.g. `main`                                   | Optional; defaults to repo default |
+   | `NEXT_PUBLIC_SITE_URL` | e.g. `https://example.com`                  | Optional; defaults to Netlify's `URL` |
    | `NODE_VERSION`       | e.g. `20`                                     | Optional; match the private app    |
 
 4. Trigger a deploy: *Deploys → Trigger deploy → Deploy site*.
@@ -28,6 +30,18 @@ Netlify → checkout this repo → node scripts/build-private.js
 After that, push to the private repo and trigger a deploy again. This repo doesn't need to change.
 To deploy automatically, create a Netlify **build hook** and `POST` to it from a
 GitHub Action in the private repo.
+
+## Private app requirements (static export)
+
+- Set `output: "export"` in `next.config.*`.
+- Every route must be static (no `ƒ (Dynamic)` in the `next build` output):
+  - Routes with known params: export `generateStaticParams()`.
+  - Routes with IDs known only in the browser: use a query param (`/page?id=…`) and read it with `useSearchParams()` inside `<Suspense>`.
+- Add `export const dynamic = "force-static";` to `robots.ts` and `sitemap.ts`.
+- Don't use API routes, server actions, middleware, `cookies()` or `headers()`.
+- Serve `out/` locally (e.g. `npx serve out`); `next start` doesn't work with a static export.
+- Put Netlify `_redirects` / `_headers` files in `public/`.
+- Check locally: `npm run build` must create `out/`.
 
 ## Creating the GitHub token
 

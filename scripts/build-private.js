@@ -73,6 +73,9 @@ function parseRepoUrl(raw) {
 function cleanEnv(extra = {}) {
   const env = { ...process.env, ...extra };
   delete env.SOURCE_REPO_TOKEN;
+  // Default the app's absolute URL (sitemap, canonical links) to the site's
+  // main Netlify URL unless it is set explicitly.
+  if (!env.NEXT_PUBLIC_SITE_URL && env.URL) env.NEXT_PUBLIC_SITE_URL = env.URL;
   return env;
 }
 
